@@ -3,7 +3,8 @@ The [Codeception](http://codeception.com/) module for **SSH commands and SSH tun
 
 ## Minimum Requirements
 - Codeception 2.2
-- PHP 5.4
+- PHP 5.5
+- Extension [SecureShell2](http://www.php.net/ssh2)
 
 ## Installation
 The extension can be installed using [Composer](https://getcomposer.org)

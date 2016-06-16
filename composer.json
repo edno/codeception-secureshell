@@ -11,7 +11,8 @@
       }
   ],
   "require": {
-    "php": ">=5.4",
+    "php": "^5.5 || ^7.0",
+    "ext-ssh2": "*",
     "codeception/codeception": "^2.2"
   },
   "require-dev": {
