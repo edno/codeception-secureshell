@@ -8,3 +8,5 @@ composer.phar
 # ignore local configuration files
 *.yml
 !*.dist.yml
+!.travis.yml
+!.coveralls.yml
