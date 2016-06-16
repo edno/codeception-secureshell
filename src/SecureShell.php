@@ -25,9 +25,9 @@ class SecureShell extends \Codeception\Platform\Extension
     protected static $connections = [];
 
     public function openConnection($host,
-                                   $port = SecureShell::DEFAULT_PORT,
-                                   $auth = SecureShell::AUTH_PASSWORD,
-                                   ...$args)
+                                    $port = SecureShell::DEFAULT_PORT,
+                                    $auth = SecureShell::AUTH_PASSWORD,
+                                    ...$args)
     {
         $uid = null;
         $callbacks = array('disconnect' => [$this, '_disconnect']);
@@ -122,7 +122,7 @@ class SecureShell extends \Codeception\Platform\Extension
 
     protected function _disconnect()
     {
-        foreach ($this->connections as $id => $connection){
+        foreach ($this->connections as $id => $connection) {
             if (is_resource($connection['resource']) !== true) {
                 unset($this->connections[$id]);
             }
