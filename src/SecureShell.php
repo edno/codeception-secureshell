@@ -136,9 +136,24 @@ class SecureShell extends \Codeception\Platform\Extension
 
     }
 
+    public function seeRemoteOutput()
+    {
+
+    }
+
+    public function dontSeeRemoteOutput()
+    {
+
+    }
+
     /** Remote Files methods **/
 
     public function seeRemoteFile()
+    {
+
+    }
+
+    public function dontSeeRemoteFile()
     {
 
     }
@@ -161,6 +176,11 @@ class SecureShell extends \Codeception\Platform\Extension
     /** Remote Dir methods **/
 
     public function seeRemoteDir()
+    {
+
+    }
+
+    public function dontSeeRemoteDir()
     {
 
     }
