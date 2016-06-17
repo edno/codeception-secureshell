@@ -35,9 +35,9 @@ class SecureShell extends \Codeception\Platform\Extension
         if (!($connection = ssh2_connect($host, $port, $callbacks))) {
             throw new ModuleException("Cannot connect to server {$host}:{$port}");
         } else {
-            $this->_checkFingerprint($connection);
+            $this->__checkFingerprint($connection);
 
-            if ($this->_authenticate($connection, ...$args) === false) {
+            if ($this->__authenticate($connection, ...$args) === false) {
                 throw new ModuleException("Authentication failed on server {$host}:{$port}");
             } else {
                 $uid = uniqid('ssh_');
@@ -52,7 +52,7 @@ class SecureShell extends \Codeception\Platform\Extension
     }
 
     public function closeConnection($uid) {
-        switch ($this->_isValidConnnection($uid)) {
+        switch ($this->__isValidConnnection($uid)) {
             case 0:
             case 1:
                 unset($this->connections[$uid]);
@@ -62,7 +62,7 @@ class SecureShell extends \Codeception\Platform\Extension
         }
     }
 
-    protected function _isValidConnnection($uid) {
+    protected function __isValidConnnection($uid) {
         if (isset($this->connections[$uid])) {
             if (is_resource($this->connections[$uid]['resource'])) {
                 return 1;
@@ -74,7 +74,7 @@ class SecureShell extends \Codeception\Platform\Extension
         }
     }
 
-    protected function _authenticate($connection, $method, ...$args)
+    protected function __authenticate($connection, $method, ...$args)
     {
         switch ($method) {
             case SecureShell::AUTH_PASSWORD:
@@ -92,7 +92,7 @@ class SecureShell extends \Codeception\Platform\Extension
         }
     }
 
-    protected function _checkFingerprint($connection, $acceptUnknown = false)
+    protected function __checkFingerprint($connection, $acceptUnknown = false)
     {
         $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
         $knownHost = false;
@@ -120,7 +120,7 @@ class SecureShell extends \Codeception\Platform\Extension
         return true;
     }
 
-    protected function _disconnect()
+    protected function __disconnect()
     {
         foreach ($this->connections as $id => $connection) {
             if (is_resource($connection['resource']) !== true) {
