@@ -35,7 +35,7 @@ class SecureShell extends \Codeception\Platform\Extension
         if (!($connection = ssh2_connect($host, $port, $callbacks))) {
             throw new ModuleException(get_class($this), "Cannot connect to server {$host}:{$port}");
         } else {
-            $this->__checkFingerprint($connection);
+            $fp = $this->__checkFingerprint($connection);
 
             if ($this->__authenticate($connection, ...$args) === false) {
                 throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
@@ -94,9 +94,9 @@ class SecureShell extends \Codeception\Platform\Extension
 
     protected function __checkFingerprint($connection, $acceptUnknown = false)
     {
-        $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
         $knownHost = false;
         try {
+            $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
             $file = new SplFileObject($this->knownHostsFile);
             $file->setFlags(SplFileObject::READ_CSV);
             $file->setCsvControl(' ');
@@ -117,7 +117,7 @@ class SecureShell extends \Codeception\Platform\Extension
                 throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         }
-        return true;
+        return $fingerprint;
     }
 
     protected function __disconnect()
