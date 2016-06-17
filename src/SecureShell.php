@@ -33,12 +33,12 @@ class SecureShell extends \Codeception\Platform\Extension
         $callbacks = array('disconnect' => [$this, '_disconnect']);
 
         if (!($connection = ssh2_connect($host, $port, $callbacks))) {
-            throw new ModuleException("Cannot connect to server {$host}:{$port}");
+            throw new ModuleException(get_class($this), "Cannot connect to server {$host}:{$port}");
         } else {
             $this->__checkFingerprint($connection);
 
             if ($this->__authenticate($connection, ...$args) === false) {
-                throw new ModuleException("Authentication failed on server {$host}:{$port}");
+                throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
             } else {
                 $uid = uniqid('ssh_');
                 $this->connections[$uid] = ['host' => $host,
@@ -58,7 +58,7 @@ class SecureShell extends \Codeception\Platform\Extension
                 unset($this->connections[$uid]);
                 break;
             default:
-                throw new ModuleException("{$uid} is not a valid SSH connection");
+                throw new ModuleException(get_class($this), "{$uid} is not a valid SSH connection");
         }
     }
 
@@ -88,7 +88,7 @@ class SecureShell extends \Codeception\Platform\Extension
             case SecureShell::AUTH_NONE:
                 return ssh2_auth_none($connection, ...$args);
             default:
-                throw new ModuleException('Unsupported authentication method');
+                throw new ModuleException(get_class($this), 'Unsupported authentication method');
         }
     }
 
@@ -110,11 +110,11 @@ class SecureShell extends \Codeception\Platform\Extension
             $knownHost = $knownHost || $acceptUnknown;
 
             if ($knownHost === false) {
-                throw new ModuleException('Unable to verify server identity!');
+                throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         } catch (RuntimeException $e) {
             if ($acceptUnknown === false) {
-                throw new ModuleException('Unable to verify server identity!');
+                throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         }
         return true;
