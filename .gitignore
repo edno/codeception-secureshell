@@ -1,12 +1,6 @@
 composer.lock
 composer.phar
-/vendor/
+vendor/
 
-/tests/_output/
-/tests/_support/_generated/
-
-# ignore local configuration files
-*.yml
-!*.dist.yml
-!.travis.yml
-!.coveralls.yml
+tests/_output/*
+tests/_support/_generated/
