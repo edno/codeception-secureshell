@@ -11,11 +11,4 @@ settings:
     memory_limit: 1024M
 extensions:
     enabled:
-        - Codeception\Extension\RunFailed
-modules:
-    config:
-        Db:
-            dsn: ''
-            user: ''
-            password: ''
-            dump: tests/_data/dump.sql
+        - Codeception\Extension\SecureShell
