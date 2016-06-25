@@ -28,11 +28,11 @@ class SecureShell extends Module
 
     protected $tunnels = [];
 
-    protected $connections = [];
+    protected $connection;
 
     private $output;
 
-    public function openConnection( $host,
+    public function openConnection($host,
                                     $port = SecureShell::DEFAULT_PORT,
                                     $auth = SecureShell::AUTH_PASSWORD,
                                     ...$args)
@@ -51,13 +51,7 @@ class SecureShell extends Module
                     throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
                 } else {
                     $uid = hash('crc32', uniqid($fp), false);
-                    $this->connections = array_merge($this->connections,
-                                        [$uid => ['host' => $host,
-                                                'port' => $port,
-                                                'fingerprint' => $fp,
-                                                'auth_method' => $auth,
-                                                'resource' => $connection]
-                                        ]);
+                    $this->connection = $connection;
                 }
             }
         } catch (ModuleException $e) {
@@ -68,11 +62,11 @@ class SecureShell extends Module
         return $uid;
     }
 
-    public function closeConnection($uid) {
-        switch ($this->__isValidConnnection($uid)) {
+    public function closeConnection() {
+        switch ($this->__isValidConnnection()) {
             case 0:
             case 1:
-                unset($this->connections[$uid]);
+                $this->connection = null;
                 break;
             default:
                 throw new ModuleException(get_class($this), "{$uid} is not a valid SSH connection");
@@ -80,19 +74,15 @@ class SecureShell extends Module
         return true;
     }
 
-    public function getConnection($uid) {
-        return $this->connections[$uid]['resource'];
+    public function getConnection() {
+        return $this->connection;
     }
 
-    protected function __isValidConnnection($uid) {
-        if (isset($this->connections[$uid])) {
-            if (is_resource($this->connections[$uid]['resource'])) {
-                return 1;
-            } else {
-                return 0;
-            }
+    protected function __isValidConnnection() {
+        if (is_resource($this->connection)) {
+            return 1;
         } else {
-            return -1;
+            return 0;
         }
     }
 
@@ -102,7 +92,7 @@ class SecureShell extends Module
             case SecureShell::AUTH_PASSWORD:
                 return ssh2_auth_password($connection, ...$args);
             case SecureShell::AUTH_PUBKEY:
-            return ssh2_auth_pubkey_file($connection, ...$args);
+                return ssh2_auth_pubkey_file($connection, ...$args);
             case SecureShell::AUTH_HOSTKEY:
                 return ssh2_auth_hostbased_file($connection, ...$args);
             case SecureShell::AUTH_AGENT:
@@ -144,20 +134,15 @@ class SecureShell extends Module
 
     protected function __disconnect()
     {
-        foreach ($this->connections as $id => $connection) {
-            if (is_resource($connection['resource']) !== true) {
-                unset($this->connections[$id]);
-            }
-        }
+        $this->connection = null;
     }
 
     /** Remote Commands methods **/
 
-    public function runRemoteCommand($session, $command)
+    public function runRemoteCommand($command)
     {
         try {
-            $connection = $this->getConnection($session);
-            $stream = ssh2_exec($connection, $command);
+            $stream = ssh2_exec($this->connection, $command);
             stream_set_blocking($stream, true);
             $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
             $this->output['STDOUT'] = stream_get_contents($stream);
@@ -180,18 +165,16 @@ class SecureShell extends Module
 
     /** Remote Files methods **/
 
-    public function seeRemoteFile($session, $filename)
+    public function seeRemoteFile($filename)
     {
-        $connection = $this->getConnection($session);
-        $sftp = ssh2_sftp($connection);
+        $sftp = ssh2_sftp($this->connection);
         $res = ssh2_sftp_stat($sftp, $filename);
         \PHPUnit_Framework_Assert::assertNotEmpty($res);
     }
 
-    public function dontSeeRemoteFile($session, $filename)
+    public function dontSeeRemoteFile($filename)
     {
-        $connection = $this->getConnection($session);
-        $sftp = ssh2_sftp($connection);
+        $sftp = ssh2_sftp($this->connection);
         try {
             $res = (bool) ssh2_sftp_stat($sftp, $filename);
         } catch(Exception $e) {
@@ -200,11 +183,10 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertFalse($res);
     }
 
-    public function grabRemoteFile($session, $filename)
+    public function grabRemoteFile($filename)
     {
         try {
-            $connection = $this->getConnection($session);
-            $sftp = ssh2_sftp($connection);
+            $sftp = ssh2_sftp($this->connection);
             return file_get_contents("ssh2.sftp://{$sftp}/{$filename}");
         } catch (Exception $e) {
             throw new ModuleException(get_class($this), $e->getMessage());

@@ -5,7 +5,6 @@ use Codeception\Exception\ModuleException;;
 
 class SecureShellCest
 {
-    private $connection = null;
     private $tester;
 
     public function _before(FunctionalTester $I)
@@ -20,12 +19,12 @@ class SecureShellCest
     // tests
     public function openConnection()
     {
-        $this->connection = $this->tester->openConnection('localhost',
-                                                        32768,
-                                                        SecureShell::AUTH_PASSWORD,
-                                                        'root',
-                                                        'screencast');
-        $this->tester->assertNotNull($this->connection, 'Not a valid connection or connection failed');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 
     /**
@@ -33,28 +32,12 @@ class SecureShellCest
      */
     public function closeConnection()
     {
-        $connection = $this->tester->openConnection('localhost',
-                                                        32768,
-                                                        SecureShell::AUTH_PASSWORD,
-                                                        'root',
-                                                        'screencast');
-        $this->tester->assertTrue($this->tester->closeConnection($connection));
-    }
-
-    /**
-     * @depends openConnection
-     * @depends closeConnection
-     */
-    public function openTwoConnections()
-    {
-        $connection2 = $this->tester->openConnection('localhost',
-                                                        32768,
-                                                        SecureShell::AUTH_PASSWORD,
-                                                        'root',
-                                                        'screencast');
-        $this->tester->assertNotNull($connection2, 'Not a valid connection or connection failed');
-        $this->tester->assertNotEquals($this->connection, $connection2);
-        $this->tester->closeConnection($connection2);
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->assertTrue($this->tester->closeConnection());
     }
 
     /**
@@ -62,7 +45,12 @@ class SecureShellCest
      */
     public function runRemoteCommand()
     {
-        $res = $this->tester->runRemoteCommand($this->connection, "echo 'Test runRemoteCommand'");
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $res = $this->tester->runRemoteCommand("echo 'Test runRemoteCommand'");
         $this->tester->assertContains('Test runRemoteCommand', $res['STDOUT']);
     }
 
@@ -71,7 +59,12 @@ class SecureShellCest
      */
     public function runRemoteCommandError()
     {
-        $res = $this->tester->runRemoteCommand($this->connection, 'invalid_command');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $res = $this->tester->runRemoteCommand('invalid_command');
         $this->tester->assertContains('invalid_command', $res['STDERR']);
     }
 
@@ -80,7 +73,12 @@ class SecureShellCest
      */
     public function seeInRemoteOutput()
     {
-        $this->tester->runRemoteCommand($this->connection, 'echo "Test runRemoteCommand"');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->runRemoteCommand('echo "Test runRemoteCommand"');
         $this->tester->seeInRemoteOutput('Test runRemoteCommand');
     }
 
@@ -89,7 +87,12 @@ class SecureShellCest
      */
     public function dontSeeInRemoteOutput()
     {
-        $this->tester->runRemoteCommand($this->connection, 'echo "Test runRemoteCommand"');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->runRemoteCommand('echo "Test runRemoteCommand"');
         $this->tester->dontSeeInRemoteOutput('Dont see Test runRemoteCommand');
     }
 
@@ -98,8 +101,13 @@ class SecureShellCest
      */
     public function seeRemoteFile()
     {
-        $this->tester->runRemoteCommand($this->connection, 'echo "remoteFile" > remote.file');
-        $this->tester->seeRemoteFile($this->connection, 'remote.file');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->runRemoteCommand('echo "remoteFile" > remote.file');
+        $this->tester->seeRemoteFile('remote.file');
     }
 
     /**
@@ -107,7 +115,12 @@ class SecureShellCest
      */
     public function dontSeeRemoteFile()
     {
-        $this->tester->dontSeeRemoteFile($this->connection, 'remote.nofile');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->dontSeeRemoteFile('remote.nofile');
     }
 
     /**
@@ -115,7 +128,12 @@ class SecureShellCest
      */
     public function grabRemoteFile()
     {
-        $res = $this->tester->grabRemoteFile($this->connection, '/root/remote.file');
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $res = $this->tester->grabRemoteFile('/root/remote.file');
         $this->tester->assertContains('remoteFile', $res);
     }
 }
