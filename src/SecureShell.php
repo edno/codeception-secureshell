@@ -79,7 +79,7 @@ class SecureShell extends Module
     }
 
     public function getConnection($uid) {
-        return $this->connections[$uid];
+        return $this->connections[$uid]['resource'];
     }
 
     protected function __isValidConnnection($uid) {
@@ -151,9 +151,15 @@ class SecureShell extends Module
 
     /** Remote Commands methods **/
 
-    public function runRemoteCommand()
+    public function runRemoteCommand($session, $command)
     {
-
+        $connection = $this->getConnection($session);
+        $stream = ssh2_exec($connection, $command);
+        stream_set_blocking($stream, true);
+        $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+        $output['STDOUT'] = stream_get_contents($stream);
+        $output['STDERR'] = stream_get_contents($errStream);
+        return $output;
     }
 
     public function seeRemoteOutput()
