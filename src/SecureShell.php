@@ -98,7 +98,7 @@ class SecureShell extends Module
             $file->setFlags(SplFileObject::READ_CSV);
             $file->setCsvControl(' ');
             foreach ($file as $entry) {
-                list(, , $fp) = $entry;
+                list(,, $fp) = $entry;
                 $knownHost = (strcmp($fp, $fingerprint) !== 0);
                 if ($knownHost === true) {
                     break;
@@ -162,7 +162,7 @@ class SecureShell extends Module
         $sftp = ssh2_sftp($this->connection);
         try {
             $res = (bool) ssh2_sftp_stat($sftp, $filename);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $res = false;
         }
         \PHPUnit_Framework_Assert::assertFalse($res);
