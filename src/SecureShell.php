@@ -123,7 +123,7 @@ class SecureShell extends Module
             $file->setFlags(SplFileObject::READ_CSV);
             $file->setCsvControl(' ');
             foreach ($file as $entry) {
-                list($host, $method, $fp) = $entry;
+                list(, , $fp) = $entry;
                 $knownHost = (strcmp($fp, $fingerprint) !== 0);
                 if ($knownHost === true) {
                     break;
