@@ -1,6 +1,6 @@
-sudo: required
-
 language: php
+
+sudo: required
 
 branches:
   only:
@@ -9,7 +9,7 @@ branches:
 php:
   - 5.6
 
- services:
+services:
   - docker
 
 before_script:
