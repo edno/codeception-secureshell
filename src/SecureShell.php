@@ -48,7 +48,7 @@ class SecureShell extends Module
                 if ($this->__authenticate($connection, $auth, ...$args) === false) {
                     throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
                 } else {
-                    $uid = hash('crc32', $fp, false);
+                    $uid = hash('crc32', uniqid($fp), false);
                     $this->connections = array_merge($this->connections,
                                         [$uid => ['host' => $host,
                                                 'port' => $port,
@@ -75,6 +75,11 @@ class SecureShell extends Module
             default:
                 throw new ModuleException(get_class($this), "{$uid} is not a valid SSH connection");
         }
+        return true;
+    }
+
+    public function getConnection($uid) {
+        return $this->connections[$uid];
     }
 
     protected function __isValidConnnection($uid) {
