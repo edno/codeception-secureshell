@@ -92,4 +92,21 @@ class SecureShellCest
         $this->tester->runRemoteCommand($this->connection, 'echo "Test runRemoteCommand"');
         $this->tester->dontSeeInRemoteOutput('Dont see Test runRemoteCommand');
     }
+
+    /**
+     * @depends runRemoteCommand
+     */
+    public function seeRemoteFile()
+    {
+        $this->tester->runRemoteCommand($this->connection, 'echo "remoteFile" > remote.file');
+        $this->tester->seeRemoteFile($this->connection, 'remote.file');
+    }
+
+    /**
+     * @depends openConnection
+     */
+    public function dontSeeRemoteFile()
+    {
+        $this->tester->dontSeeRemoteFile($this->connection, '/root/remote.nofile');
+    }
 }

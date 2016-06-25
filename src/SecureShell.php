@@ -176,14 +176,24 @@ class SecureShell extends Module
 
     /** Remote Files methods **/
 
-    public function seeRemoteFile()
+    public function seeRemoteFile($session, $filename)
     {
-
+        $connection = $this->getConnection($session);
+        $sftp = ssh2_sftp($connection);
+        $res = ssh2_sftp_stat($sftp, $filename);
+        \PHPUnit_Framework_Assert::assertNotEmpty($res);
     }
 
-    public function dontSeeRemoteFile()
+    public function dontSeeRemoteFile($session, $filename)
     {
-
+        $connection = $this->getConnection($session);
+        $sftp = ssh2_sftp($connection);
+        try {
+            $res = ssh2_sftp_stat($sftp, $filename);
+        } catch(Exception $e) {
+            $res = false;
+        }
+        \PHPUnit_Framework_Assert::assertFalse($res);
     }
 
     public function grabRemoteFile()
