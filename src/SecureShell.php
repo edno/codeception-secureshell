@@ -30,6 +30,8 @@ class SecureShell extends Module
 
     protected $connections = [];
 
+    private $output;
+
     public function openConnection( $host,
                                     $port = SecureShell::DEFAULT_PORT,
                                     $auth = SecureShell::AUTH_PASSWORD,
@@ -157,19 +159,19 @@ class SecureShell extends Module
         $stream = ssh2_exec($connection, $command);
         stream_set_blocking($stream, true);
         $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
-        $output['STDOUT'] = stream_get_contents($stream);
-        $output['STDERR'] = stream_get_contents($errStream);
-        return $output;
+        $this->output['STDOUT'] = stream_get_contents($stream);
+        $this->output['STDERR'] = stream_get_contents($errStream);
+        return $this->output;
     }
 
-    public function seeRemoteOutput()
+    public function seeInRemoteOutput($text)
     {
-
+        \PHPUnit_Framework_Assert::assertContains($text, $this->output['STDOUT']);
     }
 
-    public function dontSeeRemoteOutput()
+    public function dontSeeInRemoteOutput($text)
     {
-
+        \PHPUnit_Framework_Assert::assertNotContains($text, $this->output['STDOUT']);
     }
 
     /** Remote Files methods **/
