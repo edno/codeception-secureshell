@@ -18,7 +18,3 @@ coverage:
     whitelist:
         include:
             - src/*
-
-extensions:
-    enabled:
-        - Codeception\Extension\SecureShell

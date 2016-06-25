@@ -2,10 +2,13 @@
 namespace Codeception\Extension;
 
 use Codeception\Exception\ModuleException;
+use Codeception\Exception\ModuleConfigException;
+use Codeception\Module;
 use \SplFileObject;
 use \RuntimeException;
+use \Exception;
 
-class SecureShell extends \Codeception\Platform\Extension
+class SecureShell extends Module
 {
 
     const DEFAULT_PORT  = 22;
@@ -15,16 +18,19 @@ class SecureShell extends \Codeception\Platform\Extension
     const AUTH_AGENT    = 4;
     const AUTH_NONE     = 0;
 
-    // list events to listen to
-    public static $events = [];
+    protected $config = [];
 
-    protected static $knownHostsFile = '~/.ssh/known_hosts';
+    protected $requiredFields = [];
 
-    protected static $tunnels = [];
+    protected static $knownHostsFile = '~/.ssh/known_hosts'; // configuration
 
-    protected static $connections = [];
+    protected static $acceptUnknownHost = true; // configuration
 
-    public function openConnection($host,
+    protected $tunnels = [];
+
+    protected $connections = [];
+
+    public function openConnection( $host,
                                     $port = SecureShell::DEFAULT_PORT,
                                     $auth = SecureShell::AUTH_PASSWORD,
                                     ...$args)
@@ -32,21 +38,30 @@ class SecureShell extends \Codeception\Platform\Extension
         $uid = null;
         $callbacks = array('disconnect' => [$this, '_disconnect']);
 
-        if (!($connection = ssh2_connect($host, $port, $callbacks))) {
-            throw new ModuleException(get_class($this), "Cannot connect to server {$host}:{$port}");
-        } else {
-            $fp = $this->__checkFingerprint($connection);
-
-            if ($this->__authenticate($connection, ...$args) === false) {
-                throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
+        try {
+            $connection = ssh2_connect($host, $port, $callbacks);
+            if (!$connection) {
+                throw new ModuleException(get_class($this), "Unable to connect to {$host} on port {$port}");
             } else {
-                $uid = uniqid('ssh_');
-                $this->connections[$uid] = ['host' => $host,
-                                            'port' => $port,
-                                            'fingerprint' => $fp,
-                                            'auth_method' => $auth,
-                                            'resource' => $connection];
+                $fp = $this->__checkFingerprint($connection);
+
+                if ($this->__authenticate($connection, $auth, ...$args) === false) {
+                    throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
+                } else {
+                    $uid = hash('crc32', $fp, false);
+                    $this->connections = array_merge($this->connections,
+                                        [$uid => ['host' => $host,
+                                                'port' => $port,
+                                                'fingerprint' => $fp,
+                                                'auth_method' => $auth,
+                                                'resource' => $connection]
+                                        ]);
+                }
             }
+        } catch (ModuleException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new ModuleException(get_class($this), $e->getMessage());
         }
         return $uid;
     }
@@ -92,12 +107,12 @@ class SecureShell extends \Codeception\Platform\Extension
         }
     }
 
-    protected function __checkFingerprint($connection, $acceptUnknown = false)
+    protected function __checkFingerprint($connection)
     {
         $knownHost = false;
         try {
             $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
-            $file = new SplFileObject($this->knownHostsFile);
+            $file = new SplFileObject(static::$knownHostsFile);
             $file->setFlags(SplFileObject::READ_CSV);
             $file->setCsvControl(' ');
             foreach ($file as $entry) {
@@ -107,13 +122,13 @@ class SecureShell extends \Codeception\Platform\Extension
                     break;
                 }
             }
-            $knownHost = $knownHost || $acceptUnknown;
+            $knownHost = $knownHost || static::$acceptUnknownHost;
 
             if ($knownHost === false) {
                 throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         } catch (RuntimeException $e) {
-            if ($acceptUnknown === false) {
+            if (static::$acceptUnknownHost === false) {
                 throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         }
