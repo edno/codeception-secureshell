@@ -193,7 +193,7 @@ class SecureShell extends Module
         $connection = $this->getConnection($session);
         $sftp = ssh2_sftp($connection);
         try {
-            $res = ssh2_sftp_stat($sftp, $filename);
+            $res = (bool) ssh2_sftp_stat($sftp, $filename);
         } catch(Exception $e) {
             $res = false;
         }
