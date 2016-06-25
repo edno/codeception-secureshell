@@ -19,8 +19,8 @@ before_script:
   - docker ps -a
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq libssh2-1-dev
-  - if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then sudo apt-get install -y -qq libssh2-php; fi
   - touch .interactive
+  - if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then pecl install -f ssh2-0.13 < .interactive; fi
   - if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then pecl install -f ssh2-1.0 < .interactive; fi
   - php -m | grep ssh2
   - composer self-update
