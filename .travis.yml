@@ -11,7 +11,6 @@ php:
 before_script:
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq libssh2-1-dev libssh2-php
-  - sudo apt-get install php5-ssh2
   - php -m | grep ssh2
   - composer self-update
   - composer install
