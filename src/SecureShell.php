@@ -63,14 +63,7 @@ class SecureShell extends Module
     }
 
     public function closeConnection() {
-        switch ($this->__isValidConnnection()) {
-            case 0:
-            case 1:
-                $this->connection = null;
-                break;
-            default:
-                throw new ModuleException(get_class($this), "{$uid} is not a valid SSH connection");
-        }
+        $this->connection = null;
         return true;
     }
 
