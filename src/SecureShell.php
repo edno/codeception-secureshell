@@ -155,13 +155,17 @@ class SecureShell extends Module
 
     public function runRemoteCommand($session, $command)
     {
-        $connection = $this->getConnection($session);
-        $stream = ssh2_exec($connection, $command);
-        stream_set_blocking($stream, true);
-        $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
-        $this->output['STDOUT'] = stream_get_contents($stream);
-        $this->output['STDERR'] = stream_get_contents($errStream);
-        return $this->output;
+        try {
+            $connection = $this->getConnection($session);
+            $stream = ssh2_exec($connection, $command);
+            stream_set_blocking($stream, true);
+            $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+            $this->output['STDOUT'] = stream_get_contents($stream);
+            $this->output['STDERR'] = stream_get_contents($errStream);
+            return $this->output;
+        } catch (Exception $e) {
+            throw new ModuleException(get_class($this), $e->getMessage());
+        }
     }
 
     public function seeInRemoteOutput($text)
@@ -196,19 +200,15 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertFalse($res);
     }
 
-    public function grabRemoteFile()
+    public function grabRemoteFile($session, $filename)
     {
-
-    }
-
-    public function copyRemoteFile()
-    {
-
-    }
-
-    public function deleteRemoteFile()
-    {
-
+        try {
+            $connection = $this->getConnection($session);
+            $sftp = ssh2_sftp($connection);
+            return file_get_contents("ssh2.sftp://{$sftp}/{$filename}");
+        } catch (Exception $e) {
+            throw new ModuleException(get_class($this), $e->getMessage());
+        }
     }
 
     /** Remote Dir methods **/

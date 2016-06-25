@@ -107,6 +107,15 @@ class SecureShellCest
      */
     public function dontSeeRemoteFile()
     {
-        $this->tester->dontSeeRemoteFile($this->connection, '/root/remote.nofile');
+        $this->tester->dontSeeRemoteFile($this->connection, 'remote.nofile');
+    }
+
+    /**
+     * @depends seeRemoteFile
+     */
+    public function grabRemoteFile()
+    {
+        $res = $this->tester->grabRemoteFile($this->connection, '/root/remote.file');
+        $this->tester->assertContains('remoteFile', $res);
     }
 }
