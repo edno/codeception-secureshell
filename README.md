@@ -12,7 +12,7 @@ The [Codeception](http://codeception.com/) module for **SSH commands** and **SSH
 
 ## Minimum Requirements
 - Codeception 2.2
-- PHP 5.5
+- PHP 5.6
 - Extension [SecureShell2](http://www.php.net/ssh2)
 
 ## Installation
