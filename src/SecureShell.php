@@ -71,14 +71,6 @@ class SecureShell extends Module
         return $this->connection;
     }
 
-    protected function __isValidConnnection() {
-        if (is_resource($this->connection)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     protected function __authenticate($connection, $method, ...$args)
     {
         switch ($method) {
