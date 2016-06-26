@@ -136,4 +136,46 @@ class SecureShellCest
         $res = $this->tester->grabRemoteFile('/root/remote.file');
         $this->tester->assertContains('remoteFile', $res);
     }
+
+    /**
+     * @depends openConnection
+     * @depends seeRemoteFile
+     */
+    public function grabRemoteDir()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $res = $this->tester->grabRemoteDir('/root/.');
+        $this->tester->assertContains('remote.file', $res);
+    }
+
+    /**
+     * @depends grabRemoteDir
+     */
+    public function seeRemoteDir()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->runRemoteCommand('mkdir -p testdir');
+        $this->tester->seeRemoteDir('/root/testdir');
+    }
+
+    /**
+     * @depends grabRemoteDir
+     */
+    public function dontSeeRemoteDir()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'screencast');
+        $this->tester->dontSeeRemoteDir('/root/dirnotexist');
+    }
 }

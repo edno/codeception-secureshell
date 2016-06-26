@@ -180,29 +180,36 @@ class SecureShell extends Module
 
     /** Remote Dir methods **/
 
-    public function seeRemoteDir()
+    public function seeRemoteDir($dirname)
     {
-
+        try {
+            $res = (bool) $this->grabRemoteDir($dirname);
+        } catch (Exception $e) {
+            $res = false;
+        }
+        \PHPUnit_Framework_Assert::assertTrue($res);
     }
 
     public function dontSeeRemoteDir()
     {
-
+        try {
+            $res = (bool) $this->grabRemoteDir($dirname);
+        } catch (Exception $e) {
+            $res = false;
+        }
+        \PHPUnit_Framework_Assert::assertFalse($res);
     }
 
-    public function copyRemoteDir()
+    public function grabRemoteDir($dirname)
     {
-
-    }
-
-    public function deleteRemoteDir()
-    {
-
-    }
-
-    public function readRemoteDir()
-    {
-
+        $res = null;
+        try {
+            $sftp = ssh2_sftp($this->connection);
+            $res = scandir("ssh2.sftp://{$sftp}/{$dirname}");
+        } catch (Exception $e) {
+            throw new ModuleException(get_class($this), $e->getMessage());
+        }
+        return $res;
     }
 
     /** Tunnel methods **/
