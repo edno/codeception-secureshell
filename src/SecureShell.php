@@ -26,7 +26,7 @@ class SecureShell extends Module
 
     protected static $acceptUnknownHost = true; // configuration
 
-    protected $tunnels = [];
+    protected $tunnel;
 
     protected $connection;
 
@@ -214,14 +214,19 @@ class SecureShell extends Module
 
     /** Tunnel methods **/
 
-    public function openRemoteTunnel()
+    public function openRemoteTunnel($host, $port)
     {
-
+        try {
+            $this->tunnel = ssh2_tunnel($this->connection, $host, $port);
+        } catch (Exception $e) {
+            throw new ModuleException(get_class($this), $e->getMessage());
+        }
+        return $this->tunnel;
     }
 
     public function closeRemoteTunnel()
     {
-
+        unset($this->tunnel);
     }
 
 }

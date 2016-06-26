@@ -27,7 +27,7 @@ before_script:
   - composer install
 
 script:
- - ./vendor/bin/codecept run functional --coverage-xml
+ - ./vendor/bin/codecept run --coverage-xml
 
 after_script:
   - ./vendor/bin/coveralls
