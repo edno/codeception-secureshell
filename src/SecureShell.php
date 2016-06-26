@@ -190,7 +190,7 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertTrue($res);
     }
 
-    public function dontSeeRemoteDir()
+    public function dontSeeRemoteDir($dirname)
     {
         try {
             $res = (bool) $this->grabRemoteDir($dirname);
