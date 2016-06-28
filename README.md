@@ -10,6 +10,11 @@
 
 The [Codeception](http://codeception.com/) module for **SSH commands** and **SSH tunnels**
 
+## Roadmap
+- 0.1: Basic commands for testing remote file system and commands
+- 0.2: Tunnel commands
+- 0.3: Services and advanced commands
+
 ## Minimum Requirements
 - Codeception 2.2
 - PHP 5.6
