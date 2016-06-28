@@ -7,7 +7,7 @@ MAINTAINER Greg Heitz <g.heitz@yahoo.fr>
 
 RUN apt-get update && apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
-RUN echo 'root:screencast' | chpasswd
+RUN echo 'root:password' | chpasswd
 
 # udpate SSH config
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
