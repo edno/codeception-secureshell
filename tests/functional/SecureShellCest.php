@@ -23,7 +23,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 
@@ -36,7 +36,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->assertTrue($this->tester->closeConnection());
     }
 
@@ -49,7 +49,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $res = $this->tester->runRemoteCommand("echo 'Test runRemoteCommand'");
         $this->tester->assertContains('Test runRemoteCommand', $res['STDOUT']);
     }
@@ -63,7 +63,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $res = $this->tester->runRemoteCommand('invalid_command');
         $this->tester->assertContains('invalid_command', $res['STDERR']);
     }
@@ -77,7 +77,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->runRemoteCommand('echo "Test runRemoteCommand"');
         $this->tester->seeInRemoteOutput('Test runRemoteCommand');
     }
@@ -91,7 +91,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->runRemoteCommand('echo "Test runRemoteCommand"');
         $this->tester->dontSeeInRemoteOutput('Dont see Test runRemoteCommand');
     }
@@ -105,7 +105,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->runRemoteCommand('echo "remoteFile" > remote.file');
         $this->tester->seeRemoteFile('remote.file');
     }
@@ -119,7 +119,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->dontSeeRemoteFile('remote.nofile');
     }
 
@@ -132,7 +132,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $res = $this->tester->grabRemoteFile('/root/remote.file');
         $this->tester->assertContains('remoteFile', $res);
     }
@@ -147,7 +147,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $res = $this->tester->grabRemoteDir('/root/.');
         $this->tester->assertContains('remote.file', $res);
     }
@@ -161,7 +161,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->runRemoteCommand('mkdir -p testdir');
         $this->tester->seeRemoteDir('/root/testdir');
     }
@@ -175,7 +175,7 @@ class SecureShellCest
                                         32768,
                                         SecureShell::AUTH_PASSWORD,
                                         'root',
-                                        'screencast');
+                                        'password');
         $this->tester->dontSeeRemoteDir('/root/dirnotexist');
     }
 }
