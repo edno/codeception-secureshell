@@ -25,6 +25,9 @@ before_script:
   - php -m | grep ssh2
   - composer self-update
   - composer install
+  - eval "$(ssh-agent -s)" #start the ssh agent
+  - chmod 600 tests/_data/docker/keys/user001
+  - ssh-add tests/_data/docker/keys/user001
 
 script:
  - ./vendor/bin/codecept run --coverage-xml
