@@ -58,13 +58,14 @@ class SecureShellCest
     }
 
     /**
-     * @skip
+     * 
      */
     public function openConnectionNone()
     {
         $this->tester->openConnection('localhost',
                                         32768,
-                                        SecureShell::AUTH_NONE);
+                                        SecureShell::AUTH_NONE,
+                                        'user002');
         $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 

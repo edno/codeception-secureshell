@@ -18,13 +18,18 @@ RUN sed -i 's/#AuthorizedKeysFile/AuthorizedKeysFile/' /etc/ssh/sshd_config
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
 
-# additional user
+# add user001
 RUN useradd user001
 RUN mkdir -p /home/user001/.ssh
 COPY keys/user001.pub /home/user001/user001.pub
 RUN cat /home/user001/user001.pub >> /home/user001/.ssh/authorized_keys
 RUN chown -R user001 /home/user001
 RUN chmod 0700 /home/user001/.ssh; chmod 0600 /home/user001/.ssh/authorized_keys
+
+# add user002
+RUN useradd user002
+RUN passwd --delete user002
+
 RUN exit
 
 ENV NOTVISIBLE "in users profile"
