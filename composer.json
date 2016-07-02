@@ -27,5 +27,10 @@
       "preferred-install": "dev"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "post-install-cmd": [
+            "ssh-add tests/_data/docker/keys/user001"
+        ]
+    }
 }

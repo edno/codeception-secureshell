@@ -44,22 +44,16 @@ class SecureShellCest
     {
         $this->tester->openConnection('localhost',
                                         32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
+                                        SecureShell::AUTH_HOSTKEY);
         $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 
-    /**
-     * @skip
-     */
     public function openConnectionAgent()
     {
         $this->tester->openConnection('localhost',
                                         32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
+                                        SecureShell::AUTH_AGENT,
+                                        'user001');
         $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 
@@ -70,9 +64,7 @@ class SecureShellCest
     {
         $this->tester->openConnection('localhost',
                                         32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
+                                        SecureShell::AUTH_NONE);
         $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 
