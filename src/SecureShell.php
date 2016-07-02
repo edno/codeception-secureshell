@@ -117,11 +117,6 @@ class SecureShell extends Module
         return $fingerprint;
     }
 
-    protected function __disconnect()
-    {
-        $this->connection = null;
-    }
-
     /** Remote Commands methods **/
 
     public function runRemoteCommand($command)
