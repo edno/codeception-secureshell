@@ -13,16 +13,18 @@ RUN echo 'root:password' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 RUN sed -i 's/PermitEmptyPasswords no/PermitEmptyPasswords yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#AuthorizedKeysFile/AuthorizedKeysFile/' /etc/ssh/sshd_config
 
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
 
 # additional user
 RUN useradd user001
-RUN su user001
-RUN mkdir ~/.ssh; mkdir ~/.ssh/authorized_keys
-COPY keys/user001_rsa.pub /home/user001/.ssh/authorized_keys/id_rsa.pub
-RUN chmod -R 0700 /home/user001/.ssh
+RUN mkdir -p /home/user001/.ssh
+COPY keys/user001.pub /home/user001/user001.pub
+RUN cat /home/user001/user001.pub >> /home/user001/.ssh/authorized_keys
+RUN chown -R user001 /home/user001
+RUN chmod 0700 /home/user001/.ssh; chmod 0600 /home/user001/.ssh/authorized_keys
 RUN exit
 
 ENV NOTVISIBLE "in users profile"

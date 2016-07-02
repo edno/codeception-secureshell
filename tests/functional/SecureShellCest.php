@@ -1,23 +1,46 @@
 <?php
 
 use Codeception\Extension\SecureShell;
-use Codeception\Exception\ModuleException;;
+use Codeception\Exception\ModuleException;
+use Codeception\Configuration;
 
 class SecureShellCest
 {
     private $tester;
+    private $data;
 
     public function _before(FunctionalTester $I)
     {
         $this->tester = $I;
-    }
-
-    public function _after()
-    {
+        $this->keys = Configuration::dataDir().'docker/keys/';
     }
 
     // tests
-    public function openConnection()
+    public function openConnectionPassword()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'password');
+        $this->tester->assertNotNull('Not a valid connection or connection failed');
+    }
+
+    public function openConnectionPublicKey()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PUBKEY,
+                                        'user001',
+                                        $this->keys.'user001.pub',
+                                        $this->keys.'user001');
+        $this->tester->assertNotNull('Not a valid connection or connection failed');
+    }
+
+    /**
+     * @skip
+     */
+    public function openConnectionHostKey()
     {
         $this->tester->openConnection('localhost',
                                         32768,
@@ -28,7 +51,33 @@ class SecureShellCest
     }
 
     /**
-     * @depends openConnection
+     * @skip
+     */
+    public function openConnectionAgent()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'password');
+        $this->tester->assertNotNull('Not a valid connection or connection failed');
+    }
+
+    /**
+     * @skip
+     */
+    public function openConnectionNone()
+    {
+        $this->tester->openConnection('localhost',
+                                        32768,
+                                        SecureShell::AUTH_PASSWORD,
+                                        'root',
+                                        'password');
+        $this->tester->assertNotNull('Not a valid connection or connection failed');
+    }
+
+    /**
+     * @depends openConnectionPassword
      */
     public function closeConnection()
     {
@@ -41,7 +90,7 @@ class SecureShellCest
     }
 
     /**
-     * @depends openConnection
+     * @depends openConnectionPassword
      */
     public function runRemoteCommand()
     {
@@ -111,7 +160,7 @@ class SecureShellCest
     }
 
     /**
-     * @depends openConnection
+     * @depends openConnectionPassword
      */
     public function dontSeeRemoteFile()
     {
@@ -138,7 +187,7 @@ class SecureShellCest
     }
 
     /**
-     * @depends openConnection
+     * @depends openConnectionPassword
      * @depends seeRemoteFile
      */
     public function grabRemoteDir()
