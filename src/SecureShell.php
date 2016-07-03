@@ -31,6 +31,9 @@ class SecureShell extends Module
 
     private $output;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function _initialize()
     {
         if (isset($this->config['StrictHostKeyChecking'])) {
@@ -40,11 +43,11 @@ class SecureShell extends Module
             static::$knownHostsFile = $this->config['KnownHostsFile'];
         } elseif (static::$strictHostKeyChecking) {
             // default KnownHostsFile if StrictHostKeyChecking enabled
-            static::$knownHostsFile = Configuration::projectDir() . 'known_hosts';
+            static::$knownHostsFile = Configuration::projectDir().'known_hosts';
         }
         // check that a KnownHostsFile exists if StrictHostKeyChecking enabled
         if (static::$strictHostKeyChecking && !file_exists(static::$knownHostsFile)) {
-            throw new ModuleConfigException(get_class($this), 'KnownHostsFile "' . static::$knownHostsFile . '" not found');
+            throw new ModuleConfigException(get_class($this), 'KnownHostsFile "'.static::$knownHostsFile.'" not found');
         }
     }
 
@@ -108,7 +111,7 @@ class SecureShell extends Module
         $knownHost = false;
         try {
             $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5);
-            if (file_exists(static::$knownHostsFile)){
+            if (file_exists(static::$knownHostsFile)) {
                 $file = new SplFileObject(static::$knownHostsFile);
                 $file->setFlags(SplFileObject::READ_CSV);
                 $file->setCsvControl(' ');
