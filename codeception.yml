@@ -18,3 +18,19 @@ coverage:
     whitelist:
         include:
             - src/*
+
+env:
+    nochecking:
+
+    strictchecking:
+        modules:
+            config:
+                Codeception\Extension\SecureShell:
+                    StrictHostKeyChecking: true
+
+    knownhosts:
+        modules:
+            config:
+                Codeception\Extension\SecureShell:
+                    StrictHostKeyChecking: true
+                    KnownHostsFile: 'tests/_data/knownhosts.fp.file'

@@ -42,7 +42,10 @@
         ],
         "setup-keys": [
             "chmod 600 tests/_data/docker/keys/user001",
-            "ssh-add tests/_data/docker/keys/user001"
+            "ssh-add tests/_data/docker/keys/user001",
+            "ssh-keyscan -p 32768 localhost > tests/_data/knownhosts.file",
+            "ssh-keygen -l -f tests/_data/knownhosts.file -E md5 > tests/_data/knownhosts.fp.file",
+            "cp tests/_data/knownhosts.fp.file ./known_hosts"
         ]
     }
 }

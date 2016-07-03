@@ -4,6 +4,7 @@ namespace Codeception\Extension;
 use Codeception\Exception\ModuleException;
 use Codeception\Exception\ModuleConfigException;
 use Codeception\Module;
+use Codeception\Configuration;
 use \SplFileObject;
 use \RuntimeException;
 use \Exception;
@@ -18,24 +19,40 @@ class SecureShell extends Module
     const AUTH_AGENT    = 4;
     const AUTH_NONE     = 0;
 
-    protected $config = [];
+    protected $config = ['StrictHostKeyChecking', 'KnownHostsFile'];
 
     protected $requiredFields = [];
 
-    protected static $knownHostsFile = '~/.ssh/known_hosts'; // configuration
+    protected static $knownHostsFile = '';
 
-    protected static $acceptUnknownHost = true; // configuration
+    protected static $strictHostKeyChecking = false;
 
     protected $connection;
 
     private $output;
+
+    public function _initialize()
+    {
+        if (isset($this->config['StrictHostKeyChecking'])) {
+            static::$strictHostKeyChecking = (bool) $this->config['StrictHostKeyChecking'];
+        }
+        if (isset($this->config['KnownHostsFile'])) {
+            static::$knownHostsFile = $this->config['KnownHostsFile'];
+        } elseif (static::$strictHostKeyChecking) {
+            // default KnownHostsFile if StrictHostKeyChecking enabled
+            static::$knownHostsFile = Configuration::projectDir() . 'known_hosts';
+        }
+        // check that a KnownHostsFile exists if StrictHostKeyChecking enabled
+        if (static::$strictHostKeyChecking && !file_exists(static::$knownHostsFile)) {
+            throw new ModuleConfigException(get_class($this), 'KnownHostsFile "' . static::$knownHostsFile . '" not found');
+        }
+    }
 
     public function openConnection($host,
                                     $port = SecureShell::DEFAULT_PORT,
                                     $auth = SecureShell::AUTH_PASSWORD,
                                     ...$args)
     {
-        $uid = null;
         $callbacks = array('disconnect' => [$this, '_disconnect']);
 
         try {
@@ -43,12 +60,11 @@ class SecureShell extends Module
             if (!$connection) {
                 throw new ModuleException(get_class($this), "Unable to connect to {$host} on port {$port}");
             } else {
-                $fp = $this->__checkFingerprint($connection);
+                $this->__checkFingerprint($connection);
 
                 if ($this->__authenticate($connection, $auth, ...$args) === false) {
                     throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
                 } else {
-                    $uid = hash('crc32', uniqid($fp), false);
                     $this->connection = $connection;
                 }
             }
@@ -57,7 +73,7 @@ class SecureShell extends Module
         } catch (Exception $e) {
             throw new ModuleException(get_class($this), $e->getMessage());
         }
-        return $uid;
+        return $this->connection;
     }
 
     public function closeConnection() {
@@ -91,24 +107,27 @@ class SecureShell extends Module
     {
         $knownHost = false;
         try {
-            $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
-            $file = new SplFileObject(static::$knownHostsFile);
-            $file->setFlags(SplFileObject::READ_CSV);
-            $file->setCsvControl(' ');
-            foreach ($file as $entry) {
-                list(,, $fp) = $entry;
-                $knownHost = (strcmp($fp, $fingerprint) !== 0);
-                if ($knownHost === true) {
-                    break;
+            $fingerprint = ssh2_fingerprint($connection, SSH2_FINGERPRINT_MD5);
+            if (file_exists(static::$knownHostsFile)){
+                $file = new SplFileObject(static::$knownHostsFile);
+                $file->setFlags(SplFileObject::READ_CSV);
+                $file->setCsvControl(' ');
+                foreach ($file as $entry) {
+                    list(, $fp,,) = $entry;
+                    $fp = preg_replace('/(?:MD5)?:/', '', $fp);
+                    $knownHost = (strcasecmp($fp, $fingerprint) === 0);
+                    if ($knownHost) {
+                        break;
+                    }
                 }
             }
-            $knownHost = $knownHost || static::$acceptUnknownHost;
+            $knownHost = $knownHost || !static::$strictHostKeyChecking;
 
             if ($knownHost === false) {
                 throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         } catch (RuntimeException $e) {
-            if (static::$acceptUnknownHost === false) {
+            if (static::$strictHostKeyChecking) {
                 throw new ModuleException(get_class($this), 'Unable to verify server identity!');
             }
         }
