@@ -168,7 +168,11 @@ class SecureShell extends Module
     public function seeRemoteFile($filename)
     {
         $sftp = ssh2_sftp($this->connection);
-        $res = ssh2_sftp_stat($sftp, $filename);
+        try {
+            $res = ssh2_sftp_stat($sftp, $filename);
+        } catch (Exception $e) {
+            $res = null;
+        }
         \PHPUnit_Framework_Assert::assertNotEmpty($res);
     }
 
