@@ -27,8 +27,7 @@ before_script:
   - eval "$(ssh-agent -s)" #start the ssh agent
   - composer setup-keys
   - ssh-keyscan -p 32768 localhost > tests/_data/knownhosts.file
-  - ssh-keygen -l -f tests/_data/knownhosts.file > tests/_data/knownhosts.fp.file
-  - cp tests/_data/knownhosts.fp.file ./known_hosts
+  - cp tests/_data/knownhosts.file ./known_hosts
 
 script:
  - ./vendor/bin/codecept run --env nochecking --env knownhosts --env strictchecking --coverage-xml

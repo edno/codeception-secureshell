@@ -33,4 +33,4 @@ env:
             config:
                 Codeception\Extension\SecureShell:
                     StrictHostKeyChecking: true
-                    KnownHostsFile: 'tests/_data/knownhosts.fp.file'
+                    KnownHostsFile: 'tests/_data/knownhosts.file'

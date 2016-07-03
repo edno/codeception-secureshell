@@ -116,8 +116,8 @@ class SecureShell extends Module
                 $file->setFlags(SplFileObject::READ_CSV);
                 $file->setCsvControl(' ');
                 foreach ($file as $entry) {
-                    list(, $fp,,) = $entry;
-                    $fp = preg_replace('/(?:MD5)?:/', '', $fp);
+                    list(,, $fp) = $entry;
+                    $fp = md5(base64_decode($fp));
                     $knownHost = (strcasecmp($fp, $fingerprint) === 0);
                     if ($knownHost) {
                         break;
