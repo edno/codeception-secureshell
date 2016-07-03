@@ -1,241 +1,243 @@
 <?php
 
 use Codeception\Extension\SecureShell;
-use Codeception\Exception\ModuleException;
 use Codeception\Configuration;
 
 class SecureShellCest
 {
-    private $tester;
-    private $data;
-
-    public function _before(FunctionalTester $I)
-    {
-        $this->tester = $I;
-        $this->keys = Configuration::dataDir().'docker/keys/';
-    }
-
     // tests
-    public function openConnectionPassword()
+    public function openConnectionPassword(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->assertNotNull('Not a valid connection or connection failed');
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->assertNotNull('Not a valid connection or connection failed');
     }
 
-    public function openConnectionPublicKey()
+    public function openConnectionPublicKey(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PUBKEY,
-                                        'user001',
-                                        $this->keys.'user001.pub',
-                                        $this->keys.'user001');
-        $this->tester->assertNotNull('Not a valid connection or connection failed');
+        $keys = Configuration::dataDir().'docker/keys/';
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PUBKEY,
+                            'user001',
+                            $keys.'user001.pub',
+                            $keys.'user001');
+        $I->assertNotNull('Not a valid connection or connection failed');
     }
 
     /**
      * @skip
      * skipped no valid config for tests
      */
-    public function openConnectionHostKey()
+    public function openConnectionHostKey(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_HOSTKEY,
-                                        'root',
-                                        'localhost',
-                                        '/etc/ssh/ssh_host_rsa_key.pub',
-                                        '/etc/ssh/ssh_host_rsa_key',
-                                        '',
-                                        'root');
-        $this->tester->assertNotNull('Not a valid connection or connection failed');
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_HOSTKEY,
+                            'root',
+                            'localhost',
+                            '/etc/ssh/ssh_host_rsa_key.pub',
+                            '/etc/ssh/ssh_host_rsa_key',
+                            '',
+                            'root');
+        $I->assertNotNull('Not a valid connection or connection failed');
     }
 
-    public function openConnectionAgent()
+    public function openConnectionAgent(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_AGENT,
-                                        'user001');
-        $this->tester->assertNotNull('Not a valid connection or connection failed');
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_AGENT,
+                            'user001');
+        $I->assertNotNull('Not a valid connection or connection failed');
     }
 
-    public function openConnectionNone()
+    public function openConnectionNone(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_NONE,
-                                        'user002');
-        $this->tester->assertNotNull('Not a valid connection or connection failed');
-    }
-
-    /**
-     * @depends openConnectionPassword
-     */
-    public function getConnection()
-    {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->assertNotNull($this->tester->getConnection());
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_NONE,
+                            'user002');
+        $I->assertNotNull('Not a valid connection or connection failed');
     }
 
     /**
      * @depends openConnectionPassword
      */
-    public function closeConnection()
+    public function getConnection(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->assertTrue($this->tester->closeConnection());
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->assertNotNull($I->getConnection());
     }
 
     /**
+     * @env nochecking
      * @depends openConnectionPassword
      */
-    public function runRemoteCommand()
+    public function closeConnection(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $res = $this->tester->runRemoteCommand("echo 'Test runRemoteCommand'");
-        $this->tester->assertContains('Test runRemoteCommand', $res['STDOUT']);
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->assertTrue($I->closeConnection());
     }
 
     /**
-     * @depends runRemoteCommand
-     */
-    public function runRemoteCommandError()
-    {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $res = $this->tester->runRemoteCommand('invalid_command');
-        $this->tester->assertContains('invalid_command', $res['STDERR']);
-    }
-
-    /**
-     * @depends runRemoteCommand
-     */
-    public function seeInRemoteOutput()
-    {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->runRemoteCommand('echo "Test runRemoteCommand"');
-        $this->tester->seeInRemoteOutput('Test runRemoteCommand');
-    }
-
-    /**
-     * @depends runRemoteCommand
-     */
-    public function dontSeeInRemoteOutput()
-    {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->runRemoteCommand('echo "Test runRemoteCommand"');
-        $this->tester->dontSeeInRemoteOutput('Dont see Test runRemoteCommand');
-    }
-
-    /**
-     * @depends runRemoteCommand
-     */
-    public function seeRemoteFile()
-    {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->runRemoteCommand('echo "remoteFile" > remote.file');
-        $this->tester->seeRemoteFile('remote.file');
-    }
-
-    /**
+     * @env nochecking
      * @depends openConnectionPassword
      */
-    public function dontSeeRemoteFile()
+    public function runRemoteCommand(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->dontSeeRemoteFile('remote.nofile');
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $res = $I->runRemoteCommand("echo 'Test runRemoteCommand'");
+        $I->assertContains('Test runRemoteCommand', $res['STDOUT']);
     }
 
     /**
+     * @env nochecking
+     * @depends runRemoteCommand
+     */
+    public function runRemoteCommandStdErr(FunctionalTester $I)
+    {
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $res = $I->runRemoteCommand('invalid_command');
+        $I->assertContains('invalid_command', $res['STDERR']);
+    }
+
+    /**
+     * @env nochecking
+     * @depends runRemoteCommand
+     */
+    public function seeInRemoteOutput(FunctionalTester $I)
+    {
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->runRemoteCommand('echo "Test runRemoteCommand"');
+        $I->seeInRemoteOutput('Test runRemoteCommand');
+    }
+
+    /**
+     * @env nochecking
+     * @depends runRemoteCommand
+     */
+    public function dontSeeInRemoteOutput(FunctionalTester $I)
+    {
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->runRemoteCommand('echo "Test runRemoteCommand"');
+        $I->dontSeeInRemoteOutput('Dont see Test runRemoteCommand');
+    }
+
+    /**
+     * @env nochecking
+     * @depends runRemoteCommand
+     */
+    public function seeRemoteFile(FunctionalTester $I)
+    {
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->runRemoteCommand('echo "remoteFile" > remote.file');
+        $I->seeRemoteFile('remote.file');
+    }
+
+    /**
+     * @env nochecking
+     * @depends openConnectionPassword
+     */
+    public function dontSeeRemoteFile(FunctionalTester $I)
+    {
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->dontSeeRemoteFile('remote.nofile');
+    }
+
+    /**
+     * @env nochecking
      * @depends seeRemoteFile
      */
-    public function grabRemoteFile()
+    public function grabRemoteFile(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $res = $this->tester->grabRemoteFile('/root/remote.file');
-        $this->tester->assertContains('remoteFile', $res);
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $res = $I->grabRemoteFile('/root/remote.file');
+        $I->assertContains('remoteFile', $res);
     }
 
     /**
+     * @env nochecking
      * @depends openConnectionPassword
      * @depends seeRemoteFile
      */
-    public function grabRemoteDir()
+    public function grabRemoteDir(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $res = $this->tester->grabRemoteDir('/root/.');
-        $this->tester->assertContains('remote.file', $res);
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $res = $I->grabRemoteDir('/root/.');
+        $I->assertContains('remote.file', $res);
     }
 
     /**
+     * @env nochecking
      * @depends grabRemoteDir
      * @depends runRemoteCommand
      */
-    public function seeRemoteDir()
+    public function seeRemoteDir(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->runRemoteCommand('mkdir -p testdir');
-        $this->tester->seeRemoteDir('/root/testdir');
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->runRemoteCommand('mkdir -p testdir');
+        $I->seeRemoteDir('/root/testdir');
     }
 
     /**
+     * @env nochecking
      * @depends grabRemoteDir
      */
-    public function dontSeeRemoteDir()
+    public function dontSeeRemoteDir(FunctionalTester $I)
     {
-        $this->tester->openConnection('localhost',
-                                        32768,
-                                        SecureShell::AUTH_PASSWORD,
-                                        'root',
-                                        'password');
-        $this->tester->dontSeeRemoteDir('/root/dirnotexist');
+        $I->openConnection('localhost',
+                            32768,
+                            SecureShell::AUTH_PASSWORD,
+                            'root',
+                            'password');
+        $I->dontSeeRemoteDir('/root/dirnotexist');
     }
 }
