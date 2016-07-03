@@ -42,7 +42,6 @@
         ],
         "setup-keys": [
             "chmod 600 tests/_data/docker/keys/user001",
-            "eval \"$(ssh-agent -s)\"",
             "ssh-add tests/_data/docker/keys/user001"
         ]
     }
