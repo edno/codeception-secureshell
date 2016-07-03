@@ -29,8 +29,19 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "setup-test": [
+        "docker-build": "docker build -t codecept/secureshell tests/_data/docker/",
+        "docker-run": [
+            "docker run -d -p 127.0.0.1:32768:22 --name codecept_secureshell codecept/secureshell",
+            "docker ps -a"
+        ],
+        "docker-stop": "docker stop codecept_secureshell",
+        "docker-remove": [
+            "docker rm -f codecept_secureshell",
+            "docker rmi codecept/secureshell"
+        ],
+        "setup-keys": [
             "chmod 600 tests/_data/docker/keys/user001",
+            "eval \"$(ssh-agent -s)\"",
             "ssh-add tests/_data/docker/keys/user001"
         ]
     }

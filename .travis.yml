@@ -14,9 +14,6 @@ services:
   - docker
 
 before_script:
-  - docker build -t codecept/secureshell tests/_data/docker/
-  - docker run -d -p 127.0.0.1:32768:22 codecept/secureshell
-  - docker ps -a
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq libssh2-1-dev
   - touch .interactive
@@ -25,8 +22,9 @@ before_script:
   - php -m | grep ssh2
   - composer self-update
   - composer install
-  - eval "$(ssh-agent -s)" #start the ssh agent
-  - composer setup-test
+  - composer docker-build
+  - composer docker-run
+  - composer setup-keys
 
 script:
  - ./vendor/bin/codecept run --coverage-xml
