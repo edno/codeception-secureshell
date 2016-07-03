@@ -31,6 +31,20 @@ class SecureShellExceptionCest
     /**
      * @env nochecking
      */
+    public function openConnectionAuthError(FunctionalTester $I)
+    {
+        $I->expectException(ModuleException::class, function () use ($I) {
+            $I->openConnection('localhost',
+                                32768,
+                                SecureShell::AUTH_PASSWORD,
+                                'root',
+                                'invalid');
+        });
+    }
+
+    /**
+     * @env nochecking
+     */
     public function runCommandError(FunctionalTester $I)
     {
         $I->closeConnection();
