@@ -35,6 +35,7 @@
             "docker ps -a"
         ],
         "docker-stop": "docker stop codecept_secureshell",
+        "docker-restart": "docker restart codecept_secureshell",
         "docker-remove": [
             "docker rm -f codecept_secureshell",
             "docker rmi codecept/secureshell"
