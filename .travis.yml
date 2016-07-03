@@ -26,8 +26,7 @@ before_script:
   - composer docker-run
   - eval "$(ssh-agent -s)" #start the ssh agent
   - composer setup-keys
-  - ssh-keyscan -p 32768 localhost > tests/_data/knownhosts.file
-  - cp tests/_data/knownhosts.file ./known_hosts
+  - composer setup-knownhosts
 
 script:
  - ./vendor/bin/codecept run --env nochecking --env knownhosts --env strictchecking --coverage-xml
