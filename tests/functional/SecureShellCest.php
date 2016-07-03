@@ -39,12 +39,19 @@ class SecureShellCest
 
     /**
      * @skip
+     * skipped no valid config for tests
      */
     public function openConnectionHostKey()
     {
         $this->tester->openConnection('localhost',
                                         32768,
-                                        SecureShell::AUTH_HOSTKEY);
+                                        SecureShell::AUTH_HOSTKEY,
+                                        'root',
+                                        'localhost',
+                                        '/etc/ssh/ssh_host_rsa_key.pub',
+                                        '/etc/ssh/ssh_host_rsa_key',
+                                        '',
+                                        'root');
         $this->tester->assertNotNull('Not a valid connection or connection failed');
     }
 
@@ -206,6 +213,7 @@ class SecureShellCest
 
     /**
      * @depends grabRemoteDir
+     * @depends runRemoteCommand
      */
     public function seeRemoteDir()
     {

@@ -26,8 +26,6 @@ class SecureShell extends Module
 
     protected static $acceptUnknownHost = true; // configuration
 
-    protected $tunnel;
-
     protected $connection;
 
     private $output;
