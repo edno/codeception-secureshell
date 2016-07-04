@@ -23,16 +23,29 @@ class SecureShell extends Module
 
     protected $requiredFields = [];
 
+    /**
+     * @var string $knownHostsFile
+     */
     protected static $knownHostsFile = '';
 
+    /**
+     * @var bool $strictHostKeyChecking
+     */
     protected static $strictHostKeyChecking = false;
 
+    /**
+     * @var mixed|null $connection
+     */
     protected $connection;
 
+    /**
+     * @var string[] $output
+     */
     private $output;
 
     /**
      * @codeCoverageIgnore
+     * @ignore Codeception specific
      */
     public function _initialize()
     {
@@ -51,6 +64,16 @@ class SecureShell extends Module
         }
     }
 
+    /**
+     * Open an SSH connection to the host
+     *
+     * @param string $host
+     * @param int $port
+     * @param int $auth
+     * @param mixed ...$args
+     *
+     * @return resource|null Returns the SSH connection
+     */
     public function openConnection($host,
                                     $port = SecureShell::DEFAULT_PORT,
                                     $auth = SecureShell::AUTH_PASSWORD,
@@ -79,15 +102,34 @@ class SecureShell extends Module
         return $this->connection;
     }
 
+    /**
+     * Close current SSH connection
+     *
+     * @return true
+     */
     public function closeConnection() {
         $this->connection = null;
         return true;
     }
 
+    /**
+     * Get current SSH connection
+     *
+     * @return resource|null Return current SSH connection
+     */
     public function getConnection() {
         return $this->connection;
     }
 
+    /**
+     * Run SSH authentication based on the selected method
+     *
+     * @param resource $connection
+     * @param int $method
+     * @param mixed ...$args
+     *
+     * @return void
+     */
     protected function __authenticate($connection, $method, ...$args)
     {
         switch ($method) {
@@ -106,6 +148,13 @@ class SecureShell extends Module
         }
     }
 
+    /**
+     * Check if the SSH server public key fingerprint is valid
+     *
+     * @param resource $connection
+     *
+     * @return string Server public key fingerprint
+     */
     protected function __checkFingerprint($connection)
     {
         $knownHost = false;
@@ -137,8 +186,13 @@ class SecureShell extends Module
         return $fingerprint;
     }
 
-    /** Remote Commands methods **/
-
+    /**
+     * Run a command on the remote host and return the output
+     *
+     * @param string $command
+     *
+     * @return string[] Return command output 'STDOUT' and 'STDERR'
+     */
     public function runRemoteCommand($command)
     {
         try {
@@ -153,18 +207,38 @@ class SecureShell extends Module
         }
     }
 
+    /**
+     * Verify that the last remote command output contains a specific text
+     *
+     * @param string $text
+     *
+     * @return void
+     */
     public function seeInRemoteOutput($text)
     {
         \PHPUnit_Framework_Assert::assertContains($text, $this->output['STDOUT']);
     }
 
+    /**
+     * Verify that the last remote command output does not contain a specific text
+     *
+     * @param string $text
+     *
+     * @return void
+     */
     public function dontSeeInRemoteOutput($text)
     {
         \PHPUnit_Framework_Assert::assertNotContains($text, $this->output['STDOUT']);
     }
 
-    /** Remote Files methods **/
 
+    /**
+     * Verify that a file exists in the current remote folder
+     *
+     * @param string $filename
+     *
+     * @return void
+     */
     public function seeRemoteFile($filename)
     {
         $sftp = ssh2_sftp($this->connection);
@@ -176,6 +250,13 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertNotEmpty($res);
     }
 
+    /**
+     * Verify that a file does not exist in the current remote folder
+     *
+     * @param string $filename
+     *
+     * @return void
+     */
     public function dontSeeRemoteFile($filename)
     {
         $sftp = ssh2_sftp($this->connection);
@@ -187,6 +268,13 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertFalse($res);
     }
 
+    /**
+     * Get the content of a remote file over SFTP
+     *
+     * @param string $filename
+     *
+     * @return $string File content
+     */
     public function grabRemoteFile($filename)
     {
         try {
@@ -197,8 +285,13 @@ class SecureShell extends Module
         }
     }
 
-    /** Remote Dir methods **/
-
+    /**
+     * Verify that a remote folder exists in the current remote path
+     *
+     * @param string $dirname
+     *
+     * @return void
+     */
     public function seeRemoteDir($dirname)
     {
         try {
@@ -209,6 +302,13 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertTrue($res);
     }
 
+    /**
+     * Verify that a remote folder does not exist in the current remote path
+     *
+     * @param string $dirname
+     *
+     * @return void
+     */
     public function dontSeeRemoteDir($dirname)
     {
         try {
@@ -219,6 +319,13 @@ class SecureShell extends Module
         \PHPUnit_Framework_Assert::assertFalse($res);
     }
 
+    /**
+     * Get the remode folder content
+     *
+     * @param string $dirname
+     *
+     * @return string[] Array of file names and folder names
+     */
     public function grabRemoteDir($dirname)
     {
         $res = null;

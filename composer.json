@@ -16,7 +16,8 @@
         "codeception/codeception": "^2.2"
     },
     "require-dev": {
-        "satooshi/php-coveralls": "^1.0"
+        "satooshi/php-coveralls": "^1.0",
+        "victorjonsson/markdowndocs": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -47,6 +48,11 @@
         "setup-knownhosts": [
             "ssh-keyscan -p 32768 localhost > tests/_data/knownhosts.file",
             "cp tests/_data/knownhosts.file ./known_hosts"
+        ],
+        "phpdoc-md": [
+            "rm -rf docs",
+            "git clone https://github.com/edno/codeception-secureshell.wiki.git docs",
+            "vendor/victorjonsson/markdowndocs/bin/phpdoc-md generate src > docs/extension.md"
         ]
     }
 }
