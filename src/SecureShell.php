@@ -105,7 +105,7 @@ class SecureShell extends Module
     /**
      * Close current SSH connection
      *
-     * @return true
+     * @return boolean Return true once executed
      */
     public function closeConnection() {
         $this->connection = null;
@@ -273,7 +273,7 @@ class SecureShell extends Module
      *
      * @param string $filename
      *
-     * @return $string File content
+     * @return string File content
      */
     public function grabRemoteFile($filename)
     {
