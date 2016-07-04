@@ -52,7 +52,7 @@
         "phpdoc-md": [
             "rm -rf docs",
             "git clone https://github.com/edno/codeception-secureshell.wiki.git docs",
-            "vendor/victorjonsson/markdowndocs/bin/phpdoc-md generate src > docs/extension.md"
+            "vendor/victorjonsson/markdowndocs/bin/phpdoc-md generate src > docs/Extension.md"
         ]
     }
 }
