@@ -61,3 +61,6 @@ modules:
             KnownHostsFile: '/etc/ssh/known_hosts'
 ```
 The file must respect the [OpenSSH **~/.ssh/known_hosts** format](https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#.7E.2F.ssh.2Fknown_hosts).
+
+## Documentation
+Documentation is available in the wiki [List of commands and methods](https://github.com/edno/codeception-secureshell/wiki/List-of-commands-and-methods).
