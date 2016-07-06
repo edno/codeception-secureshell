@@ -60,7 +60,7 @@ class SecureShell extends Module
         }
         // check that a KnownHostsFile exists if StrictHostKeyChecking enabled
         if (static::$strictHostKeyChecking && !file_exists(static::$knownHostsFile)) {
-            throw new ModuleConfigException(get_class($this), 'KnownHostsFile "'.static::$knownHostsFile.'" not found');
+            throw new ModuleConfigException(__CLASS__, 'KnownHostsFile "'.static::$knownHostsFile.'" not found');
         }
     }
 
@@ -84,12 +84,12 @@ class SecureShell extends Module
         try {
             $connection = ssh2_connect($host, $port, $callbacks);
             if (!$connection) {
-                throw new ModuleException(get_class($this), "Unable to connect to {$host} on port {$port}");
+                throw new ModuleException(__CLASS__, "Unable to connect to {$host} on port {$port}");
             } else {
                 $this->__checkFingerprint($connection);
 
                 if ($this->__authenticate($connection, $auth, ...$args) === false) {
-                    throw new ModuleException(get_class($this), "Authentication failed on server {$host}:{$port}");
+                    throw new ModuleException(__CLASS__, "Authentication failed on server {$host}:{$port}");
                 } else {
                     $this->connection = $connection;
                 }
@@ -97,7 +97,7 @@ class SecureShell extends Module
         } catch (ModuleException $e) {
             throw $e;
         } catch (Exception $e) {
-            throw new ModuleException(get_class($this), $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
         return $this->connection;
     }
@@ -144,7 +144,7 @@ class SecureShell extends Module
             case SecureShell::AUTH_NONE:
                 return ssh2_auth_none($connection, ...$args);
             default:
-                throw new ModuleException(get_class($this), 'Unsupported authentication method');
+                throw new ModuleException(__CLASS__, 'Unsupported authentication method');
         }
     }
 
@@ -176,11 +176,11 @@ class SecureShell extends Module
             $knownHost = $knownHost || !static::$strictHostKeyChecking;
 
             if ($knownHost === false) {
-                throw new ModuleException(get_class($this), 'Unable to verify server identity!');
+                throw new ModuleException(__CLASS__, 'Unable to verify server identity!');
             }
         } catch (RuntimeException $e) {
             if (static::$strictHostKeyChecking) {
-                throw new ModuleException(get_class($this), 'Unable to verify server identity!');
+                throw new ModuleException(__CLASS__, 'Unable to verify server identity!');
             }
         }
         return $fingerprint;
@@ -203,7 +203,7 @@ class SecureShell extends Module
             $this->output['STDERR'] = stream_get_contents($errStream);
             return $this->output;
         } catch (Exception $e) {
-            throw new ModuleException(get_class($this), $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
     }
 
@@ -281,7 +281,7 @@ class SecureShell extends Module
             $sftp = ssh2_sftp($this->connection);
             return file_get_contents("ssh2.sftp://{$sftp}/{$filename}");
         } catch (Exception $e) {
-            throw new ModuleException(get_class($this), $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
     }
 
@@ -333,7 +333,7 @@ class SecureShell extends Module
             $sftp = ssh2_sftp($this->connection);
             $res = scandir("ssh2.sftp://{$sftp}/{$dirname}");
         } catch (Exception $e) {
-            throw new ModuleException(get_class($this), $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
         return $res;
     }
