@@ -21,6 +21,8 @@ before_script:
   - touch .interactive
   - if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then pecl install -f ssh2-0.13 < .interactive; fi
   - if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then pecl install -f ssh2-1.0 < .interactive; fi
+  - if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then pecl install -f ssh2-1.0 < .interactive; fi
+  - if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then pecl install -f ssh2-1.0 < .interactive; fi
   - php -m | grep ssh2
   - composer self-update
   - composer install
