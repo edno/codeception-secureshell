@@ -1,3 +1,7 @@
+**This repo is not maintained. For a more recent version, please refer to [dianaolaru/codeception-secureshell](https://github.com/dianaolaru/codeception-secureshell).**
+
+---
+
 # Codeception Secure Shell
 
 [![Latest Version](https://img.shields.io/packagist/v/edno/codeception-secureshell.svg?style=flat-square)](https://packagist.org/packages/edno/codeception-secureshell)
